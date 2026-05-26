@@ -1,0 +1,53 @@
+{
+  "name": "@viyuni/vpp",
+  "version": "0.0.0",
+  "description": "A Vite+ extension toolkit for project-aware CLI command dispatch.",
+  "homepage": "https://github.com/viyuni/vpp#readme",
+  "bugs": {
+    "url": "https://github.com/viyuni/vpp/issues"
+  },
+  "license": "MIT",
+  "author": "BaiYanchen <bycrxemail@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viyuni/vpp.git"
+  },
+  "bin": {
+    "vpp": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "PROMPT.md"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs",
+    "./test": "./dist/test.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "vp run build",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "arg": "^5.0.2",
+    "defu": "^6.1.7",
+    "unconfig": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "@typescript/native-preview": "7.0.0-dev.20260509.2",
+    "bumpp": "^11.1.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "^0.1.20"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
