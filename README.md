@@ -19,10 +19,103 @@ framework, and calls the matching test command.
 - Config merging with `defu`
 - CLI argument parsing with `arg`
 - Vite+ config type augmentation through `vpp`
+- Command helpers for Vite+ tasks:
+  - `createCommand`
+  - `createArgs`
+  - `vpRun`
 - Test framework selection:
   - `vite-plus/test`
   - `vitest`
   - `bun:test`
+
+## Command Helpers
+
+`@viyuni/vpp` exports small helpers for composing Vite+ task commands in
+`vite.config.ts`.
+
+### `createCommand`
+
+Use `createCommand` when you want to build reusable command prefixes:
+
+```ts
+import { createCommand } from '@viyuni/vpp';
+
+const vp = createCommand('vp');
+const publish = vp.with('pm').with('publish');
+
+vp('pack');
+// => 'vp pack'
+
+publish('--access public');
+// => 'vp pm publish --access public'
+```
+
+Empty fragments are ignored and command fragments are trimmed.
+
+### `createArgs`
+
+Use `createArgs` when you need an argv array instead of a shell command string:
+
+```ts
+import { createArgs } from '@viyuni/vpp';
+
+const testArgs = createArgs('test').with('tests/foo.test.ts');
+
+testArgs('-t', 'case name');
+// => ['test', 'tests/foo.test.ts', '-t', 'case name']
+```
+
+### `vpRun`
+
+Use `vpRun` to generate `vp run` commands for Vite+ tasks and workspace runs:
+
+```ts
+import { defineConfig } from 'vite-plus';
+import { vpRun } from '@viyuni/vpp';
+
+export default defineConfig({
+  run: {
+    tasks: {
+      build: {
+        command: vpRun('build'),
+      },
+      dev: {
+        command: vpRun('dev', {
+          filter: '@my/app',
+          parallel: true,
+          recursive: true,
+        }),
+        cache: false,
+      },
+      details: {
+        command: vpRun('', {
+          lastDetails: true,
+        }),
+      },
+    },
+  },
+});
+```
+
+Examples:
+
+```ts
+vpRun('build');
+// => 'vp run build'
+
+vpRun('test', {
+  args: ['--reporter verbose'],
+});
+// => 'vp run test --reporter verbose'
+
+vpRun('dev', {
+  concurrencyLimit: 4,
+  filter: ['@my/app', '!@my/utils'],
+  parallel: true,
+  recursive: true,
+});
+// => 'vp run -r --parallel --concurrency-limit 4 --filter @my/app --filter !@my/utils dev'
+```
 
 ## Configuration
 
