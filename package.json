@@ -1,6 +1,6 @@
 {
   "name": "@viyuni/vpp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Vite+ extension toolkit for project-aware CLI command dispatch.",
   "homepage": "https://github.com/viyuni/vpp#readme",
   "bugs": {
