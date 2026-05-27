@@ -1,8 +1,8 @@
-export type BuiltinTestFramework = 'bun:test' | 'vite-plus/test' | 'vitest';
+export type BuiltinTestFramework = 'bun:test' | 'vitest' | 'vp';
 
-export type TestFrameworkRunner = {
+export type VppCommandConfig = {
   /**
-   * The executable command used by the selected test framework.
+   * The executable command to run.
    */
   command: string;
   /**
@@ -10,10 +10,20 @@ export type TestFrameworkRunner = {
    */
   args?: string[];
   /**
-   * Environment values merged into the spawned test process.
+   * Environment values merged into the spawned process.
    */
   env?: Record<string, string>;
 };
+
+export type VppCommandRunner = VppCommandConfig;
+
+export type CommandRunner = VppCommandRunner;
+
+export type TestFrameworkRunner = VppCommandRunner;
+
+export type BuiltinTypecheckRunner = 'nuxt' | 'tsc' | 'vp';
+
+export type VppTypecheckConfig = BuiltinTypecheckRunner | VppCommandConfig;
 
 export interface VppCliRunOptions {
   cwd: string;
@@ -34,34 +44,30 @@ export interface VppCliCallOptions {
 
 export type VppTestConfig =
   | BuiltinTestFramework
-  | {
+  | ({
       name: BuiltinTestFramework;
-      env?: Record<string, string>;
-    };
+    } & Pick<VppCommandConfig, 'env'>);
 
 export interface VppConfig {
   /**
    * Selects which test framework vpp should load.
    *
-   * `vite-plus/test` keeps Vite+'s bundled Vitest runner, `vitest` runs a
-   * project-provided Vitest binary, and `bun:test` runs Bun's test command.
+   * `vp` keeps Vite+'s bundled test runner, `vitest` runs a project-provided
+   * Vitest binary, and `bun:test` runs Bun's test command.
    */
   test?: VppTestConfig;
+  /**
+   * Selects the type-check runner used by `vpp check` when
+   * `lint.options.typeCheck` is enabled.
+   *
+   * When unset, `vpp check` delegates directly to `vp check`.
+   */
+  typecheck?: VppTypecheckConfig;
 }
 
 export type VppUserConfig = {
   vpp?: VppConfig;
 };
-
-//@ts-ignore
-declare module 'vite' {
-  interface UserConfig {
-    /**
-     * vpp extensions for vite-plus.
-     */
-    vpp?: VppConfig;
-  }
-}
 
 //@ts-ignore
 declare module 'vite-plus' {

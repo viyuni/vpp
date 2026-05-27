@@ -3,17 +3,19 @@
 vpp is a small extension toolkit for Vite+. It adds a CLI layer that can load
 project configuration and dispatch commands to different underlying tools.
 
-The current focus is test runner selection. You run one command:
+The current focus is project-aware command dispatch. You can run:
 
 ```bash
+vpp check
 vpp test
 ```
 
-vpp reads the `vpp` field from your Vite+ config, resolves the configured test
-framework, and calls the matching test command.
+vpp reads your Vite+ config, resolves the configured behavior, and calls the
+matching underlying tools.
 
 ## Supported Features
 
+- `vpp check` command dispatch
 - `vpp test` command dispatch
 - Config loading from `vite.config.ts` with `unconfig`
 - Config merging with `defu`
@@ -24,9 +26,14 @@ framework, and calls the matching test command.
   - `createArgs`
   - `vpRun`
 - Test framework selection:
-  - `vite-plus/test`
+  - `vp`
   - `vitest`
   - `bun:test`
+- Type-check runner selection for `vpp check`:
+  - Manual `nuxt typecheck`
+  - Manual `tsc --noEmit`
+  - Manual custom command
+  - Default passthrough to `vp check`
 
 ## Command Helpers
 
@@ -154,7 +161,7 @@ If no test framework is configured, vpp defaults to:
 ```ts
 {
   vpp: {
-    test: 'vite-plus/test',
+    test: 'vp',
   },
 }
 ```
@@ -165,13 +172,79 @@ That resolves to:
 vp test
 ```
 
+## Check Command
+
+`vpp check` defaults to `vp check` and forwards arguments unchanged:
+
+```bash
+vpp check --fix
+# => vp check --fix
+```
+
+Nuxt projects use the default `vp check` passthrough unless configured
+explicitly:
+
+```ts
+import { defineConfig } from 'vite-plus';
+
+export default defineConfig({
+  lint: {
+    options: {
+      typeCheck: true,
+    },
+  },
+  vpp: {
+    typecheck: 'nuxt',
+  },
+});
+```
+
+TypeScript projects can configure `tsc` manually:
+
+```ts
+import { defineConfig } from 'vite-plus';
+
+export default defineConfig({
+  lint: {
+    options: {
+      typeCheck: true,
+    },
+  },
+  vpp: {
+    typecheck: 'tsc',
+  },
+});
+```
+
+You can also provide a custom command:
+
+```ts
+export default defineConfig({
+  vpp: {
+    typecheck: {
+      command: 'tsc',
+      args: ['--noEmit'],
+    },
+  },
+});
+```
+
+Supported flags match the Vite+ check command:
+
+```bash
+vpp check --fix
+vpp check --no-fmt
+vpp check --no-lint
+vpp check --no-fmt --no-lint
+```
+
 ## Test Command Mapping
 
-| vpp config       | Resolved command |
-| ---------------- | ---------------- |
-| `vite-plus/test` | `vp test`        |
-| `vitest`         | `vitest`         |
-| `bun:test`       | `bun test`       |
+| vpp config | Resolved command |
+| ---------- | ---------------- |
+| `vp`       | `vp test`        |
+| `vitest`   | `vitest`         |
+| `bun:test` | `bun test`       |
 
 Arguments after `vpp test` are forwarded after the resolved test command:
 

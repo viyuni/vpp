@@ -11,7 +11,7 @@ const builtinFrameworks = {
     command: 'bun',
     args: ['test', ...args],
   }),
-  'vite-plus/test': (args: string[]) => ({
+  vp: (args: string[]) => ({
     command: 'vp',
     args: ['test', ...args],
   }),
@@ -40,11 +40,10 @@ export async function callTest(options: VppCliCallOptions): Promise<number> {
 }
 
 export function resolveTestFramework(
-  testConfig: VppTestConfig = 'vite-plus/test',
+  testConfig: VppTestConfig = 'vp',
   args: string[] = [],
 ): TestFrameworkRunner {
-  const framework =
-    typeof testConfig === 'object' ? testConfig.name : (testConfig ?? 'vite-plus/test');
+  const framework = typeof testConfig === 'object' ? testConfig.name : (testConfig ?? 'vp');
 
   const runner = resolveBuiltinFramework(framework, args);
 

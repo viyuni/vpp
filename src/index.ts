@@ -78,15 +78,27 @@ export function vpRun(task = '', options: VpRunOptions = {}): string {
     .join(' ');
 }
 
+export {
+  isTypeCheckEnabled,
+  parseCheckArgs,
+  resolveCheckCommands,
+  resolveTypecheckRunner,
+  shouldDelegateToVpCheck,
+} from './check.ts';
 export { loadVppConfig } from './config.ts';
 export { resolveTestFramework } from './test.ts';
 export type {
+  BuiltinTypecheckRunner,
   BuiltinTestFramework,
+  CommandRunner,
   TestFrameworkRunner,
+  VppCommandConfig,
+  VppCommandRunner,
   VppCliCallOptions,
   VppCliRunOptions,
   VppCliRunner,
   VppConfig,
   VppTestConfig,
+  VppTypecheckConfig,
   VppUserConfig,
 } from './types.ts';

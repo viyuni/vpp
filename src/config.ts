@@ -4,6 +4,16 @@ import type { LoadConfigSource } from 'unconfig';
 
 import type { VppConfig, VppUserConfig } from './types.ts';
 
+type VitePlusLintConfig = {
+  options?: {
+    typeCheck?: boolean;
+  };
+};
+
+export type LoadedVitePlusConfig = VppUserConfig & {
+  lint?: VitePlusLintConfig;
+};
+
 export type {
   BuiltinTestFramework,
   TestFrameworkRunner,
@@ -16,7 +26,8 @@ export type {
 } from './types.ts';
 
 const defaultVppConfig = {
-  test: 'vite-plus/test',
+  test: 'vp',
+  typecheck: 'vp',
 } satisfies VppConfig;
 
 const configSources = [
@@ -34,4 +45,18 @@ export async function loadVppConfig(cwd = process.cwd()): Promise<VppConfig> {
   });
 
   return defu(result.config, defaultVppConfig);
+}
+
+export async function loadVitePlusConfig(cwd = process.cwd()): Promise<LoadedVitePlusConfig> {
+  const result = await loadConfig.async<LoadedVitePlusConfig>({
+    cwd,
+    sources: [
+      {
+        files: 'vite.config',
+      },
+    ],
+    defaults: {},
+  });
+
+  return result.config ?? {};
 }
